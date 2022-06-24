@@ -20,7 +20,7 @@ public class DataSource {
 		return instance;
 	}
 	public void prefillData() {
-		for (int i=0;i<136;i++) {
+		for (int i=0;i<139;i++) {
 		     this.artikelHinzufuegen(i, 0);
 		      }
 		/*this.artikelHinzufuegen("Ball", "Rund");

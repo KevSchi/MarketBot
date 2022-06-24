@@ -71,9 +71,13 @@ public class BotMain {
 				
 				
 				for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
+					if (gegenstand.getId()==objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getInt(("article_id"))&&objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()>gegenstand.getPrice()) {
 			          gegenstand.setId(objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getInt(("article_id")));
-			          //gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
 			          gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
+					}
+			          //gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
+					
+			         // gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
 			        }
 			
 				System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));				
