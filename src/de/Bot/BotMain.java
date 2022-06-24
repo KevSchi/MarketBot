@@ -84,7 +84,7 @@ public class BotMain {
 				
 			}
 	
-			if preis alt und preis alt 2 kleiner als neuer preis kaufen
+			//if preis alt und preis alt 2 kleiner als neuer preis kaufen
 		}
 		// Klon für die analyse der vorigen Preise		
 		List<Artikel> gegenstandListe_trend =gegenstandListe;
