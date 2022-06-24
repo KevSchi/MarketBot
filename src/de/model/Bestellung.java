@@ -71,8 +71,8 @@ public class Bestellung {
         for (Bestellformular Bestellter_Artikel : Bestellte_Artikel) {
             JsonObjectBuilder item_builder = Json.createObjectBuilder();
             item_builder.add("id", Bestellter_Artikel.getArt().getId());
-            item_builder.add("Name", Bestellter_Artikel.getArt().getName());
-            item_builder.add("Beschreibung", Bestellter_Artikel.getArt().getEigenschaften());
+            item_builder.add("Name", Bestellter_Artikel.getArt().getPrice());
+           // item_builder.add("Beschreibung", Bestellter_Artikel.getArt().getEigenschaften());
             item_builder.add("Menge", Bestellter_Artikel.menge);
             array_builder.add(item_builder.build());
         }

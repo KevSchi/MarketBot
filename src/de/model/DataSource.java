@@ -20,7 +20,10 @@ public class DataSource {
 		return instance;
 	}
 	public void prefillData() {
-		this.artikelHinzufuegen("Ball", "Rund");
+		for (int i=0;i<136;i++) {
+		     this.artikelHinzufuegen(i, 0);
+		      }
+		/*this.artikelHinzufuegen("Ball", "Rund");
 		this.artikelHinzufuegen("Computer", "Schnell");
 		//artikel.add(new Artikel(3,"test","Test"));	
 		this.bestellungAnlegen("Buchung 1");
@@ -32,7 +35,7 @@ public class DataSource {
 		this.bestellungAnlegen("Buchung 3");
 		this.addArtToOrder(3, 2, 4);
 		this.addArtToOrder(3, 1, 17);
-		//System.out.println(artikel); // print arraylist
+		//System.out.println(artikel); // print arraylist*/
 		for (Artikel i : artikel) {
 		      System.out.println(i); 
 		      artikel.get(0).toString();    	
@@ -41,11 +44,11 @@ public class DataSource {
 		artikel.toString();
 	}
 
-	public Artikel artikelHinzufuegen(String name, String description) {
-		Artikel gegenstand = new Artikel(artikel.size() + 1, name, description);
+	public Artikel artikelHinzufuegen(int id, float price) {
+		Artikel gegenstand = new Artikel(id, price);
 		artikel.add(gegenstand);
 		//System.out.println(gegenstand); 
-		gegenstand.toString();
+		//gegenstand.toString();
 		return gegenstand;
 	}
 

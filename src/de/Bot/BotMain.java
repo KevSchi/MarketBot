@@ -8,7 +8,9 @@ import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -19,6 +21,8 @@ import javax.json.JsonReader;
 import javax.json.JsonValue;
 import javax.json.stream.JsonParser;
 
+import de.model.DataSource;
+import de.model.Artikel;
 import de.model.Bestellung.Bestellformular;
 
 public class BotMain {
@@ -37,8 +41,12 @@ public class BotMain {
 	static String auth = "1" + ":" + "+wUshSS8PNniFaDf7bqEul1Vk9ED/fJt";
 	static String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
 	static String authHeaderValue = "Basic " + new String(encodedAuth);
-	
+
 	public static void main(String[] args) throws IOException {
+		DataSource ds = DataSource.getInstance();
+	    ds.prefillData();
+	    List<Artikel> gegenstandListe = ds.getAlleArtikel();
+	       
 		String Test = sendGET();
 		System.out.println(Test);
 
@@ -50,9 +58,34 @@ public class BotMain {
 		objectarr.getJsonObject(0);
 		
 		objectarr.size();
+		System.out.println(objectarr.size());
 		System.out.println(objectarr.getJsonObject(0)+" debugfggg");
+		System.out.println((objectarr.getJsonObject(0).get("stock"))+"debugg");
+		System.out.println((objectarr.getJsonObject(0).get("stock"))+"piusse");
+		System.out.println((objectarr.getJsonObject(0).getJsonArray("stock").getJsonObject(0).get("price")));
+		for(int i =0;i<objectarr.size();i++) {
+			System.out.println(objectarr.getJsonObject(i)+" debugfggg");
+			System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			for(int y =0;y<objectarr.getJsonObject(i).getJsonArray("stock").size();y++) {
+				
+				
+				for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
+			          gegenstand.setId(objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getInt(("article_id")));
+			          //gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
+			          gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
+			        }
+			
+				System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));				
+				System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
+				
+			}
 	
+			
+		}
 		
+	
+		//Artikel art = new Artikel(objectarr.);
 		System.out.println("GET DONE_supp");
 		sendGETplayerSelf();
 		System.out.println("GET DONE");
@@ -66,8 +99,8 @@ public class BotMain {
 	        sendPOST_buy(send2);
 	        System.out.println("POST DONE");
 	        System.out.println(send2);
- 
-
+	      //  System.out.println(ds.artikelNachId(1).toString());
+			System.out.println(gegenstandListe.toString());
 	}
 
 	private static String sendGET() throws IOException {
