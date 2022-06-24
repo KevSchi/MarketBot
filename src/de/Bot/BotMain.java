@@ -46,7 +46,7 @@ public class BotMain {
 		DataSource ds = DataSource.getInstance();
 	    ds.prefillData();
 	    List<Artikel> gegenstandListe = ds.getAlleArtikel();
-	       
+
 		String Test = sendGET();
 		System.out.println(Test);
 
@@ -64,9 +64,9 @@ public class BotMain {
 		System.out.println((objectarr.getJsonObject(0).get("stock"))+"piusse");
 		System.out.println((objectarr.getJsonObject(0).getJsonArray("stock").getJsonObject(0).get("price")));
 		for(int i =0;i<objectarr.size();i++) {
-			System.out.println(objectarr.getJsonObject(i)+" debugfggg");
-			System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-			System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			//System.out.println(objectarr.getJsonObject(i)+" debugfggg");
+			//System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			//System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
 			for(int y =0;y<objectarr.getJsonObject(i).getJsonArray("stock").size();y++) {
 				
 				
@@ -75,20 +75,21 @@ public class BotMain {
 			          gegenstand.setId(objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getInt(("article_id")));
 			          gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
 					}
-			          //gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
+								          //gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
 					
 			         // gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
-			        }
-			
-				System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));				
-				System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
+			        }			
+			//	System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));				
+			//	System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
 				
 			}
 	
-			
+			if preis alt und preis alt 2 kleiner als neuer preis kaufen
 		}
-		
+		// Klon für die analyse der vorigen Preise		
+		List<Artikel> gegenstandListe_trend =gegenstandListe;
 	
+		
 		//Artikel art = new Artikel(objectarr.);
 		System.out.println("GET DONE_supp");
 		sendGETplayerSelf();
