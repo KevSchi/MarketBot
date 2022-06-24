@@ -42,19 +42,17 @@ public class BotMain {
 		ds.prefillData();
 		List<Artikel> gegenstandListe = ds.getAlleArtikel();
 
-		String Test = sendGET();
-		System.out.println(Test);
+		String Test = getSupplier();
+		// System.out.println(Test);
 
 		JsonReader jsonReader = Json.createReader(new StringReader(Test));
 		JsonArray objectarr = jsonReader.readArray();
 		jsonReader.close();
-		System.out.println(objectarr.toString() + " debug");
+		// System.out.println(objectarr.toString() + " debug");
 
 		objectarr.getJsonObject(0);
 
 		// if(objectarr.size() < gegenstandListe.size()){Adde neue Produkte}
-
-
 
 		// System.out.println(objectarr.size());
 		// System.out.println(objectarr.getJsonObject(0) + " debugfggg");
@@ -62,25 +60,28 @@ public class BotMain {
 		// System.out.println((objectarr.getJsonObject(0).get("stock")) + "piusse");
 		// System.out.println((objectarr.getJsonObject(0).getJsonArray("stock").getJsonObject(0).get("price")));
 		for (int i = 0; i < objectarr.size(); i++) {
-		// System.out.println(objectarr.getJsonObject(i)+" debugfggg");
-		// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-		// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-		JsonArray stock = objectarr.getJsonObject(i).getJsonArray("stock");
-		for (int y = 0; y < stock.size(); y++) {
-			for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
-				if (gegenstand.getId() == stock.getJsonObject(y).getInt(("article_id")) && stock.getJsonObject(y).getJsonNumber("price").doubleValue() > gegenstand.getPrice()) {
-					gegenstand.setId(stock.getJsonObject(y).getInt(("article_id"))); // Macht das überhaupt was? Sollte nicht die VerkäuferID gesetzt werden?
-					gegenstand.setPrice((stock.getJsonObject(y).getJsonNumber("price").doubleValue()));
+			// System.out.println(objectarr.getJsonObject(i)+" debugfggg");
+			// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+			JsonArray stock = objectarr.getJsonObject(i).getJsonArray("stock");
+			for (int y = 0; y < stock.size(); y++) {
+				for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
+					if (gegenstand.getId() == stock.getJsonObject(y).getInt(("article_id"))
+							&& stock.getJsonObject(y).getJsonNumber("price").doubleValue() > gegenstand.getPrice()) {
+						gegenstand.setId(stock.getJsonObject(y).getInt(("article_id"))); // Macht das überhaupt was?
+																							// Sollte nicht die
+																							// VerkäuferID gesetzt
+																							// werden?
+						gegenstand.setPrice((stock.getJsonObject(y).getJsonNumber("price").doubleValue()));
+					}
+					// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
+					// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
 				}
-				//gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
-				//gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
+				// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));
+				// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
 			}
-			//System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));
-			//System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
+			// // if preis alt und preis alt 2 kleiner als neuer preis kaufen
 		}
-		// // if preis alt und preis alt 2 kleiner als neuer preis kaufen
-		 }
-	
 
 		// Klon für die analyse der vorigen Preise
 		List<Artikel> gegenstandListe_trend = gegenstandListe;
@@ -99,14 +100,14 @@ public class BotMain {
 		JsonObject send = builder.build();
 		String send2 = send.toString();
 
-		//sendPOST_buy(send2);
+		// sendPOST_buy(send2);
 		System.out.println("POST DONE");
 		System.out.println(send2);
 		// System.out.println(ds.artikelNachId(1).toString());
 		System.out.println(gegenstandListe.toString());
 	}
 
-	private static String sendGET() throws IOException {
+	private static String getSupplier() throws IOException {
 		URL obj = new URL(GET_URL);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
