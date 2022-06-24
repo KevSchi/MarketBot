@@ -53,57 +53,31 @@ public class BotMain {
 		objectarr.getJsonObject(0);
 
 		objectarr.size();
-		System.out.println(objectarr.size());
+		// System.out.println(objectarr.size());
 		// System.out.println(objectarr.getJsonObject(0) + " debugfggg");
 		// System.out.println((objectarr.getJsonObject(0).get("stock")) + "debugg");
 		// System.out.println((objectarr.getJsonObject(0).get("stock")) + "piusse");
 		// System.out.println((objectarr.getJsonObject(0).getJsonArray("stock").getJsonObject(0).get("price")));
-		// for (int i = 0; i < objectarr.size(); i++) {
-		// // System.out.println(objectarr.getJsonObject(i)+" debugfggg");
-		// // System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-		// // System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-		// for (int y = 0; y < objectarr.getJsonObject(i).getJsonArray("stock").size();
-		// y++) {
-
-		// for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ...
-		// hinzufügen json object
-		// if (gegenstand.getId() ==
-		// objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y)
-		// .getInt(("article_id"))
-		// &&
-		// objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price")
-		// .doubleValue() > gegenstand.getPrice()) {
-		// gegenstand.setId(objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y)
-		// .getInt(("article_id")));
-		// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y)
-		// .getJsonNumber("price").doubleValue()));
-		// }
-		// //
-		// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
-
-		// //
-		// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
-		// }
-		// //
-		// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));
-		// //
-		// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
-
-		// }
-
-		// // if preis alt und preis alt 2 kleiner als neuer preis kaufen
-		// }
-		for (Artikel gegenstand : gegenstandListe) {
-			for (int i = 0; i < objectarr.size(); i++) {
-				// für jedes item in items ... hinzufügen json object
-				var stock = objectarr.getJsonObject(i).getJsonArray("stock");
-				if (stock.contains(gegenstand.getId())) {
-					gegenstand.setId(stock.getJsonObject(gegenstand.getId()).getInt(("article_id")));
-					gegenstand.setPrice((stock.getJsonObject(gegenstand.getId()).getJsonNumber("price").doubleValue()));
+		for (int i = 0; i < objectarr.size(); i++) {
+		// System.out.println(objectarr.getJsonObject(i)+" debugfggg");
+		// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+		// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
+		JsonArray stock = objectarr.getJsonObject(i).getJsonArray("stock");
+		for (int y = 0; y < stock.size(); y++) {
+			for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
+				if (gegenstand.getId() == stock.getJsonObject(y).getInt(("article_id")) && stock.getJsonObject(y).getJsonNumber("price").doubleValue() > gegenstand.getPrice()) {
+					gegenstand.setId(stock.getJsonObject(y).getInt(("article_id"))); // Macht das überhaupt was? Sollte nicht die VerkäuferID gesetzt werden?
+					gegenstand.setPrice((stock.getJsonObject(y).getJsonNumber("price").doubleValue()));
 				}
+				//gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
+				//gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
 			}
-			// if preis alt und preis alt 2 kleiner als neuer preis kaufen
+			//System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));
+			//System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
 		}
+		// // if preis alt und preis alt 2 kleiner als neuer preis kaufen
+		 }
+	
 
 		// Klon für die analyse der vorigen Preise
 		List<Artikel> gegenstandListe_trend = gegenstandListe;
@@ -122,7 +96,7 @@ public class BotMain {
 		JsonObject send = builder.build();
 		String send2 = send.toString();
 
-		sendPOST_buy(send2);
+		//sendPOST_buy(send2);
 		System.out.println("POST DONE");
 		System.out.println(send2);
 		// System.out.println(ds.artikelNachId(1).toString());

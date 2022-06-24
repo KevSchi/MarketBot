@@ -18,7 +18,7 @@ public class Artikel {
 
 @Override
 	public String toString() {
-		return "Artikel [id=" + id + ", price=" + price + ", traderid=" + traderid + "]";
+		return "Artikel [id=" + id + ", price=" + price + ", traderid=" + traderid + "]\n";
 	}
 
 public int getId() {
