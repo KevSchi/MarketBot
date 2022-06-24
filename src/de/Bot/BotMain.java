@@ -52,7 +52,10 @@ public class BotMain {
 
 		objectarr.getJsonObject(0);
 
-		objectarr.size();
+		// if(objectarr.size() < gegenstandListe.size()){Adde neue Produkte}
+
+
+
 		// System.out.println(objectarr.size());
 		// System.out.println(objectarr.getJsonObject(0) + " debugfggg");
 		// System.out.println((objectarr.getJsonObject(0).get("stock")) + "debugg");
