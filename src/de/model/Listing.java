@@ -5,7 +5,7 @@ import java.util.*;
 
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
-
+import de.model.Artikel;
 import java.io.*;
 
 public class Listing {
@@ -86,8 +86,12 @@ public class Listing {
 
     }
 
-    public static void getMissingArticle(List<Listing> list) {
-
+    public static void getMissingArticle(List<Listing> listings, List<Artikel> articles) {
+        for (int i = 0; i < articles.size(); i++) {
+            for (int j = 0; j < listings.size(); j++) {
+                // if(listings.get(j).getArtikel(j))
+            }
+        }
     }
 
 }

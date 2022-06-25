@@ -52,7 +52,6 @@ public class BotMain {
 	public static String authHeaderValue = "Basic " + new String(encodedAuth);
 
 	public static void main(String[] args) throws IOException, InterruptedException {
-		// TEst
 		DataSource ds = DataSource.getInstance();
 		ds.prefillData();
 		gegenstandListe = ds.getAlleArtikel();
@@ -61,7 +60,7 @@ public class BotMain {
 			listings = Listing.getListings();
 			String Article = getArticle();
 			String Test = Methods.getSupplier();
-			// System.out.println(Test);
+			Listing.getMissingArticle(listings, gegenstandListe);
 
 			JsonReader jsonReader = Json.createReader(new StringReader(Test));
 			JsonArray objectarr = jsonReader.readArray();
