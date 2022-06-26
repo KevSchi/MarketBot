@@ -3,7 +3,6 @@ package de.Bot;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -11,15 +10,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.*;
-import java.io.*;
-
-import com.google.common.reflect.TypeToken;
-import com.google.gson.*;
 
 import javax.json.Json;
 import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
 import javax.json.JsonReader;
 
 import de.model.*;
@@ -34,105 +27,118 @@ import java.util.PriorityQueue;
 
 public class BotMain {
 
-	static final String GET_URL_SUPPLIER = "https://hackathon-game.relaxdays.cloud/supplier";
-	private static final String GET_URL_Player_Self = "https://hackathon-game.relaxdays.cloud/player/self";
-	private static final String GET_URL_Article = "https://hackathon-game.relaxdays.cloud/article";
-	private static final String POST_URL_Buy_Article = "https://hackathon-game.relaxdays.cloud/supplier/0/article/0/buy";
-	// static String jsonInputString = "{\"Name\": \"Upendra\", \"Eigenschaften\":
-	// \"Programmer\"}";
+	public static final String BASE_URL = "http://192.168.178.47:8080";
+	static final String GET_URL_SUPPLIER = BASE_URL + "/supplier";
+	private static final String GET_URL_Player_Self = BASE_URL + "/player/self";
+	public static final int PLAYER_ID = 0;
+
+	// private static final String GET_URL_Article =
+	// "https://hackathon-game.relaxdays.cloud/article";
+
+	private static final String GET_URL_Article = BASE_URL + "/article";
+
 	static String jsonInputString_buy = "{\"count\": 10, \"price_per_unit\": 1}";
 	private static final String POST_PARAMS_Buy = jsonInputString_buy;
+	public static List<Listing> listings;
+	public static List<Artikel> articleFromSupplier;
 
-	// private static final String POST_PARAMS = jsonInputString;
-	static List<Listing> listings;
-	static List<Artikel> gegenstandListe;
+	static String authRelexdays = PLAYER_ID + ":" + "+wUshSS8PNniFaDf7bqEul1Vk9ED/fJt";
+	static String auth = PLAYER_ID + ":" + "jPjGYW7ErWG0knJB5a6Gxih+tHi2E5hT";
 
-	static String auth = "1" + ":" + "+wUshSS8PNniFaDf7bqEul1Vk9ED/fJt";
+	// static String encodedAuth =
+	// Base64.getEncoder().encodeToString(authRelaxdays.getBytes());
 	static String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
 	public static String authHeaderValue = "Basic " + new String(encodedAuth);
+	public static String SelfInfo = "0";
+	public static double MyCash = 0;
+	public static int runCount = 1;
+	public static String Article;
+	public static String Supplier;
 
 	public static void main(String[] args) throws IOException, InterruptedException {
+
 		DataSource ds = DataSource.getInstance();
 		ds.prefillData();
-		gegenstandListe = ds.getAlleArtikel();
+
+		articleFromSupplier = ds.getAlleArtikel();
 
 		while (true) {
 			listings = Listing.getListings();
-			String Article = getArticle();
-			String Test = Methods.getSupplier();
-			Listing.getMissingArticle(listings, gegenstandListe);
+			Article = getArticle();
+			Supplier = Methods.getSupplier();
 
-			JsonReader jsonReader = Json.createReader(new StringReader(Test));
-			JsonArray objectarr = jsonReader.readArray();
+			JsonReader jsonReader = Json.createReader(new StringReader(Supplier));
+			JsonArray supplierArray = jsonReader.readArray();
 			jsonReader.close();
 
 			// Wandle Json Strin der Artikel um in Json Array/Objekt
 			JsonReader jsonReader_art = Json.createReader(new StringReader(Article));
-			JsonArray artarr = jsonReader_art.readArray();
+			JsonArray articleArray = jsonReader_art.readArray();
 			jsonReader.close();
 
-			getMostTags(10, artarr);
-			// if(objectarr.size() < gegenstandListe.size()){Adde neue Produkte}
+			// System.out.println("BotMain - articleArray.size(): " + articleArray.size());
 
-			// System.out.println(objectarr.size());
-			// System.out.println(objectarr.getJsonObject(0) + " debugfggg");
-			// System.out.println((objectarr.getJsonObject(0).get("stock")) + "debugg");
-			// System.out.println((objectarr.getJsonObject(0).get("stock")) + "piusse");
-			// System.out.println((objectarr.getJsonObject(0).getJsonArray("stock").getJsonObject(0).get("price")));
-			for (int i = 0; i < objectarr.size(); i++) {
-				// System.out.println(objectarr.getJsonObject(i)+" debugfggg");
-				// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-				// System.out.println((objectarr.getJsonObject(i).get("stock"))+"piusse");
-				JsonArray stock = objectarr.getJsonObject(i).getJsonArray("stock");
-				for (int y = 0; y < stock.size(); y++) {
-					for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
-						if (gegenstand.getId() == stock.getJsonObject(y).getInt(("article_id"))
-								&& stock.getJsonObject(y).getJsonNumber("price").doubleValue() > gegenstand
-										.getPrice()) {
-							gegenstand.setId(stock.getJsonObject(y).getInt(("article_id"))); // Macht das überhaupt was?
-																								// Sollte nicht die
-																								// VerkäuferID gesetzt
-																								// werden?
-							gegenstand.setPrice((stock.getJsonObject(y).getJsonNumber("price").doubleValue()));
-
-						}
-						// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price").toString()));
-						// gegenstand.setPrice((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).getJsonNumber("price").doubleValue()));
-					}
-					// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("article_id")));
-					// System.out.println((objectarr.getJsonObject(i).getJsonArray("stock").getJsonObject(y).get("price")));
-				}
-				// // if preis alt und preis alt 2 kleiner als neuer preis kaufen
+			for (int i = 0; i < articleArray.size(); i++) {
+				Listing.getBestPrice(i);
 			}
 
-			// Klon für die analyse der vorigen Preise
-			List<Artikel> gegenstandListe_Trend_voriger_0 = gegenstandListe;
+			// getMostTags(10, artarr);
 
-			// Artikel art = new Artikel(objectarr.);
-			// System.out.println("GET DONE_supp");
+			Methods.updatePrices(supplierArray);
 
-			sendGETplayerSelf();
-			// System.out.println("GET DONE");
-			// sendPOST();
+			// Einlesen self Infostring und convert 2 Json um Cash auszulesen
 
-			// sendPOST_buy(send2);
-			System.out.println("POST DONE");
-			// System.out.println(send2);
+			Methods.chooseWhatToBuy();
 
-			// System.out.println(gegenstandListe.toString());
-			gegenstandListe.get(0).printPrices();
-			System.out.println(gegenstandListe.get(0).getMedian());
-			TimeUnit.SECONDS.sleep(29);
+			SelfInfo = sendGETplayerSelf();
+			JsonReader jsonReader_cash = Json.createReader(new StringReader(SelfInfo));
+			JsonArray Self_json = jsonReader_cash.readArray();
+			jsonReader.close();
+			MyCash = Self_json.getJsonObject(0).getJsonNumber("money").doubleValue();
+
+			System.out.println("Der Bot lief " + runCount++ + " Mal durch");
+			System.out.println("Dies ist mein Geld:  " + MyCash);
+
+			// [{"id":1,"money":0.8045645,"stock":[{"article_id":0,"stock":1},{"article_id":12,"stock":7},{"article_id":33,"stock":1},{"article_id":34,"stock":132},{"article_id":49,"stock":80},{"article_id":67,"stock":109},{"article_id":84,"stock":198},{"article_id":96,"stock":254}]}]
+
+			// https://hackathon-game.relaxdays.cloud/player/self
+
+			JsonArray itemsInStock = Self_json.getJsonObject(0).getJsonArray("stock");
+
+			for (int index = 0; index < itemsInStock.size(); index++) {
+				int artid = itemsInStock.getJsonObject(index).getJsonNumber("article_id").intValue();
+				int quantity = itemsInStock.getJsonObject(index).getJsonNumber("stock").intValue();
+				// price_per_unit =
+				// stock.getJsonObject(index).getJsonNumber("price").doubleValue();
+
+				double median = 0;
+				for (Artikel gegenstand : articleFromSupplier) {
+					if (gegenstand.getId() == artid) {
+						median = gegenstand.getMedian();
+					}
+				}
+				if (Listing.getBestPrice(artid) == 1) {
+					Listing.offer(artid, quantity, Listing.getBestPrice((int) median));
+				} else {
+					Listing.offer(artid, quantity, Listing.getBestPrice(artid));
+				}
+
+				// System.out.println(Listing.getBestPrice(artid) + " Werde ich hier auch
+				// arm?");
+			}
+
+			TimeUnit.SECONDS.sleep(30);
+
 		}
 	}
 
-	private static List<Entry<Integer, Integer>> getMostTags(int n, JsonArray artarr) {
+	static List<Entry<Integer, Integer>> getMostTags(int n, JsonArray artarr) {
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 
 		for (int j = 0; j < artarr.size(); j++) {
 			JsonArray tags = artarr.getJsonObject(j).getJsonArray("tags");
 			// for (int y = 0; y < tags.size(); y++) {
-			for (Artikel gegenstand : gegenstandListe) { // für jedes item in items ... hinzufügen json object
+			for (Artikel gegenstand : articleFromSupplier) { // für jedes item in items ... hinzufügen json object
 				if (gegenstand.getId() == artarr.getJsonObject(j).getInt("id")) {
 					gegenstand.setTagcount(tags.size());
 					map.put(gegenstand.getId(), tags.size());
@@ -142,10 +148,10 @@ public class BotMain {
 		}
 
 		List<Entry<Integer, Integer>> greatest = findGreatest(map, n);
-		System.out.println("Top " + n + " entries:");
+		// System.out.println("Top " + n + " entries:");
 
 		for (Entry<Integer, Integer> entry : greatest) {
-			System.out.println(entry);
+			// System.out.println(entry);
 			// System.out.println(entry.getKey());
 			// System.out.println(entry.getValue());
 		}
@@ -177,14 +183,14 @@ public class BotMain {
 		return result;
 	}
 
-	private static String getArticle() throws IOException {
+	static String getArticle() throws IOException {
 		URL obj = new URL(GET_URL_Article);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
 		con.setRequestProperty("Content-Type", "application/json");
 		con.setRequestProperty("Authorization", authHeaderValue);
 		int responseCode = con.getResponseCode();
-		System.out.println("GET Response Code :: " + responseCode);
+		// System.out.println("GET Response Code :: " + responseCode);
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					con.getInputStream()));
@@ -207,7 +213,7 @@ public class BotMain {
 
 	}
 
-	private static void sendGETplayerSelf() throws IOException {
+	private static String sendGETplayerSelf() throws IOException {
 		URL obj = new URL(GET_URL_Player_Self);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 		con.setRequestMethod("GET");
@@ -215,7 +221,7 @@ public class BotMain {
 		con.setRequestProperty("Authorization", authHeaderValue);
 		int responseCode = con.getResponseCode();
 		String outputCode = con.getResponseMessage();
-		System.out.println("GET Response Code :: " + responseCode + outputCode);
+		// System.out.println("GET Response Code :: " + responseCode + outputCode);
 		if (responseCode == HttpURLConnection.HTTP_OK) { // success
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					con.getInputStream()));
@@ -228,104 +234,12 @@ public class BotMain {
 			in.close();
 
 			// print result
-			System.out.println(response.toString());
+			return response.toString();
 		} else {
 			System.out.println("GET request not worked");
 		}
+		return null;
 
-	}
-
-	/*
-	 * private static void sendPOST() throws IOException {
-	 * URL obj = new URL(POST_URL);
-	 * HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-	 * con.setRequestMethod("POST");
-	 * con.setRequestProperty("Content-Type", "application/json");
-	 * con.setRequestProperty("Authorization", authHeaderValue);
-	 * // For POST only - START
-	 * con.setDoOutput(true);
-	 * OutputStream os = con.getOutputStream();
-	 * os.write(POST_PARAMS.getBytes());
-	 * os.flush();
-	 * os.close();
-	 * // For POST only - END
-	 * 
-	 * int responseCode = con.getResponseCode();
-	 * System.out.println("POST Response Code :: " + responseCode);
-	 * 
-	 * if (responseCode == HttpURLConnection.HTTP_OK) { //success
-	 * BufferedReader in = new BufferedReader(new InputStreamReader(
-	 * con.getInputStream()));
-	 * String inputLine;
-	 * StringBuffer response = new StringBuffer();
-	 * 
-	 * while ((inputLine = in.readLine()) != null) {
-	 * response.append(inputLine);
-	 * }
-	 * in.close();
-	 * 
-	 * // print result
-	 * System.out.println(response.toString());
-	 * } else {
-	 * System.out.println("POST request not worked");
-	 * }
-	 * }
-	 */
-	private static void sendPOST_buy(int count, double price_per_unit) throws IOException {
-		JsonObjectBuilder builder = Json
-				.createObjectBuilder();
-		builder.add("count", count);
-		builder.add("price_per_unit", price_per_unit);
-		JsonObject send1 = builder.build();
-		String send = send1.toString();
-
-		URL obj = new URL(POST_URL_Buy_Article);
-		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-		con.setRequestMethod("POST");
-		con.setRequestProperty("Content-Type", "application/json");
-		con.setRequestProperty("Authorization", authHeaderValue);
-		con.setRequestProperty("Accept", "*/*");
-		con.setRequestProperty("Accept-Encoding", "gzip, deflate, br");
-		con.setRequestProperty("Connection", "keep-alive");
-
-		// For POST only - START
-		con.setDoOutput(true);
-		OutputStream os = con.getOutputStream();
-		os.write(send.getBytes());
-		os.flush();
-		os.close();
-		// For POST only - END
-
-		int responseCode = con.getResponseCode();
-		String outputCode = con.getResponseMessage();
-		System.out.println("POST Response Code :: " + responseCode + " " + outputCode);
-
-		if (responseCode == HttpURLConnection.HTTP_OK) { // success
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-
-			// print result
-			System.out.println(response.toString());
-		} else {
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getErrorStream()));
-			String inputLine;
-			StringBuffer response = new StringBuffer();
-
-			while ((inputLine = in.readLine()) != null) {
-				response.append(inputLine);
-			}
-			in.close();
-			System.out.println(response.toString());
-			System.out.println("POST request not worked");
-		}
 	}
 
 }

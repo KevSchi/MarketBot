@@ -1,5 +1,6 @@
 package de.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.json.Json;
@@ -9,9 +10,9 @@ import javax.json.JsonValue;
 public class Artikel {
 	private int id;
 	private double price;
-	private int supplierId;
+	private List<Integer> supplierIds;
 	private int tagcount;
-	private List<Integer> avilableSupplier;
+	private int buyMe;
 
 	int lookBackValue = 10;
 	private double[] prices = new double[lookBackValue];
@@ -22,18 +23,18 @@ public class Artikel {
 		this.price = price;
 		this.prices[++index] = price;
 		this.tagcount = tagcount;
-	}
-
-	public void addPrice(double price) {
-		// if (index >= lookBackValue)
-		// index = 0;
-		// this.prices[++index] = price;
+		this.buyMe = buyMe;
+		this.supplierIds = new ArrayList<Integer>();
 	}
 
 	public void printPrices() {
 		for (double price : prices) {
 			System.out.println(price);
 		}
+	}
+
+	public int getBuyMe() {
+		return buyMe;
 	}
 
 	public double getMedian() {
@@ -51,7 +52,8 @@ public class Artikel {
 
 	@Override
 	public String toString() {
-		return "Artikel [id=" + id + ", price=" + price + ", traderid=" + supplierId + ", tagcount=" + tagcount + "]\n";
+		return "Artikel [id=" + id + ", price=" + price + ",  tagcount=" + tagcount
+				+ ", buyMe=" + buyMe + "]\n";
 	}
 
 	public int getId() {
@@ -60,6 +62,10 @@ public class Artikel {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public void setBuyMe(int buyMe) {
+		this.buyMe = buyMe;
 	}
 
 	public void setTagcount(int tagcount) {
@@ -75,10 +81,30 @@ public class Artikel {
 	}
 
 	public void setPrice(double price) {
-		if (index >= lookBackValue)
+		if (index >= lookBackValue - 1)
 			index = 0;
 		this.prices[++index] = price;
 		this.price = price;
+	}
+
+	public List<Integer> getSupplierIds() {
+		return supplierIds;
+	}
+
+	public void addSupplierId(int supplierId) {
+		this.supplierIds.add(supplierId);
+	}
+
+	public void removeSupplierId(int supplierId) {
+		this.supplierIds.remove(supplierId);
+	}
+
+	public boolean containsSupplierId(int supplierId) {
+		for (int supplier : supplierIds) {
+			if (supplier == supplierId)
+				return true;
+		}
+		return false;
 	}
 
 	// Umwandlung von Objekteigenschaften in Jason String
@@ -89,4 +115,5 @@ public class Artikel {
 
 		return builder.build();
 	}
+
 }
