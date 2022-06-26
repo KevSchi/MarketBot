@@ -110,8 +110,6 @@ public class BotMain {
 			for (int index = 0; index < itemsInStock.size(); index++) {
 				int artid = itemsInStock.getJsonObject(index).getJsonNumber("article_id").intValue();
 				int quantity = itemsInStock.getJsonObject(index).getJsonNumber("stock").intValue();
-				// price_per_unit =
-				// stock.getJsonObject(index).getJsonNumber("price").doubleValue();
 
 				double median = 0;
 				for (Artikel gegenstand : articleFromSupplier) {
