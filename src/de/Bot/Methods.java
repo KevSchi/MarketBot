@@ -19,9 +19,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 import de.model.Artikel;
+import de.model.Listing;
 
 public class Methods {
-    private static final double buy_price = 1.0;
+    public static final double buy_price = 10.0;
     private static final String POST_URL_Buy_Article = "https://hackathon-game.relaxdays.cloud/supplier/0/article/0/buy";
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -66,6 +67,7 @@ public class Methods {
 
     // Prüfen ob Artikel 60 Prozent billiger sind als der Median, Markieren zum
     // Kaufen
+
     public static void chooseWhatToBuy() throws IOException, InterruptedException {
         Map<Integer, Artikel> uniqueArtikel = new HashMap<Integer, Artikel>();
 
@@ -123,10 +125,10 @@ public class Methods {
                 }
             }
 
-            // Wenn die Menge die der Supplier liefern kann mal dem Preis pro Stück unser
-            // Geld übersteigt kaufen wir
-            // soviel wie wir uns leisten können. Ansonsten kaufen wir alles was verfügbar
-            // ist
+            // * Wenn die Menge die der Supplier liefern kann mal dem Preis pro Stück unser
+            // * Geld übersteigt kaufen wir
+            // * soviel wie wir uns leisten können. Ansonsten kaufen wir alles was verfügbar
+            // * ist
             if ((supplierStock != 0) && (supplierStock > article_to_buy)) {
                 quantity = article_to_buy;
             } else {
@@ -145,8 +147,6 @@ public class Methods {
             builder.add("price_per_unit", price_per_unit);
             JsonObject send1 = builder.build();
             String send = send1.toString();
-
-            System.out.println(send1.toString());
 
             URL obj = new URL(BotMain.BASE_URL + "/supplier/" + supplier_id + "/article/"
                     + article_id + "/buy");
@@ -199,12 +199,28 @@ public class Methods {
                 System.out.println(ANSI_YELLOW_BACKGROUND + ANSI_RED + "POST request not worked" + ANSI_RESET);
 
             }
-
             if (article_to_buy == 0)
                 break;
         }
-
         return 0;
+    }
+
+    public static void updateOfferPrices() throws IOException {
+        for (Listing listing : BotMain.listings) {
+            if (listing.getPlayer() == BotMain.PLAYER_ID) {
+                int offer_id = listing.getId();
+                if (listing.getCount() == 0) {
+                    // * Falls Artikel von uns vorhanden und Menge 0 Delete
+                    Listing.deleteOffer(offer_id);
+                } else {
+                    // * Falls Artikel von uns vorhanden und Menge nicht 0 Update
+                    Listing.updateOffer(listing.getId(), listing.getCount(),
+                            Listing.best_prices.get(listing.getArticle_id()));
+                    // Listing.getBestPrice(listing.getArticle_id()));
+                }
+            }
+
+        }
     }
 
     public static void updatePrices(JsonArray objectArray) {

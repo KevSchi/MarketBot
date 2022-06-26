@@ -10,13 +10,13 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-
+import de.Bot.Methods;
 import de.Bot.BotMain;
 import de.model.Artikel;
 import java.io.*;
 
 public class Listing {
-
+    public static double lowestPrice2 = 12;
     private int id;
     private int player;
     private int article;
@@ -85,16 +85,12 @@ public class Listing {
             Gson gson = new Gson();
             List<Listing> listingList = gson.fromJson(inputLine, token.getType());
             in.close();
-            /*
-             * for (Listing listing : listingList) {
-             * System.out.println(listing.getArticle_id());
-             * }
-             */
 
             return listingList;
 
         } else {
-            System.out.println("GET request not worked");
+            System.out.println(Methods.ANSI_YELLOW_BACKGROUND + Methods.ANSI_BLACK + "GET request not worked"
+                    + Methods.ANSI_RESET);
             return null;
         }
 
@@ -104,8 +100,8 @@ public class Listing {
         /**
          * Stellt vorhandene Artikel als Listing zum Kauf zur verfügung
          * POST /listing/new
-         * 
          */
+
         JsonObjectBuilder builder = Json.createObjectBuilder();
         builder.add("article", article_id);
         builder.add("count", quantity);
@@ -134,7 +130,6 @@ public class Listing {
 
         int responseCode = con.getResponseCode();
         String outputCode = con.getResponseMessage();
-        System.out.println("POST Response Code :: " + responseCode + " " + outputCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -148,7 +143,6 @@ public class Listing {
             in.close();
 
             // print result
-            System.out.println(response.toString());
             return 1;
         } else {
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -161,27 +155,58 @@ public class Listing {
             }
             in.close();
             System.out.println(response.toString());
-            System.out.println("POST request not worked");
+            System.out.println(Methods.ANSI_YELLOW_BACKGROUND + Methods.ANSI_BLACK + "POST request not worked"
+                    + Methods.ANSI_RESET);
             return 0;
         }
     }
 
+    // * Eine Liste die die günstigsten Preise für jeden Artikel beinhaltet
+    public static HashMap<Integer, Double> best_prices;
+
+    public static void updateBestPrices() {
+        best_prices = new HashMap<Integer, Double>();
+
+        for (Listing listing : BotMain.listings) {
+            double lowestPrice = Double.MAX_VALUE;
+            int article_id = listing.getArticle_id();
+            for (int i = 0; i < BotMain.listings.size(); i++) {
+                if (article_id == BotMain.listings.get(i).getArticle_id()) {
+                    if (((BotMain.listings.get(i).getPrice() > 3) && (lowestPrice > BotMain.listings.get(i).getPrice())
+                            && (BotMain.listings.get(i).getPlayer() != BotMain.PLAYER_ID)
+                            && (BotMain.listings.get(i).getCount() != 0))) {
+                        lowestPrice = BotMain.listings.get(i).getPrice() - 0.01;
+                    }
+                }
+            }
+            if (lowestPrice == Double.MAX_VALUE || lowestPrice < lowestPrice2) {
+                lowestPrice = lowestPrice2;
+            }
+            best_prices.put(article_id, lowestPrice);
+        }
+    }
+
     public static double getBestPrice(int article_Id) {
-        double lowestPrice = 100.0;
+        double lowestPrice = Double.MAX_VALUE;
         for (int i = 0; i < BotMain.listings.size(); i++) {
             if (article_Id == BotMain.listings.get(i).getArticle_id()) {
-                if ((BotMain.listings.get(i).getPrice() > 1) && lowestPrice > BotMain.listings.get(i).getPrice()
-                        && BotMain.listings.get(i).getPlayer() != BotMain.PLAYER_ID) {
+                if (((BotMain.listings.get(i).getPrice() > Methods.buy_price)
+                        && (lowestPrice > BotMain.listings.get(i).getPrice())
+                        && (BotMain.listings.get(i).getPlayer() != BotMain.PLAYER_ID)
+                        && (BotMain.listings.get(i).getCount() != 0))) {
                     lowestPrice = BotMain.listings.get(i).getPrice() - 0.01;
                 }
             }
         }
-        // System.out.println("-------- id: " + article_Id + " price: " + lowestPrice +
+        // System.out.println("-------- id: " + article_Id + " price: " + lowestPrice
         // "-----------");
+        if (lowestPrice == Double.MAX_VALUE || lowestPrice < lowestPrice2) {
+            lowestPrice = lowestPrice2;
+        }
         return lowestPrice;
     }
 
-    public static int updateOffer(int article_id, int quantity, double price) throws IOException {
+    public static int updateOffer(int listing_id, int quantity, double price) throws IOException {
         /**
          * Passt die Eigenschaften eines bereits als Listing zum Kauf angebotenen
          * Artikels an
@@ -193,7 +218,7 @@ public class Listing {
         JsonObject jsonObject = builder.build();
         String send = jsonObject.toString();
 
-        URL obj = new URL(BotMain.BASE_URL + "/listing/" + article_id);
+        URL obj = new URL(BotMain.BASE_URL + "/listing/" + listing_id);
         HttpURLConnection con = (HttpURLConnection) obj
                 .openConnection();
         con.setRequestMethod("PUT");
@@ -212,8 +237,6 @@ public class Listing {
         // For POST only - END
 
         int responseCode = con.getResponseCode();
-        String outputCode = con.getResponseMessage();
-        System.out.println("POST Response Code :: " + responseCode + " " + outputCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -227,7 +250,6 @@ public class Listing {
             in.close();
 
             // print result
-            System.out.println(response.toString());
             return 1;
         } else {
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -240,7 +262,8 @@ public class Listing {
             }
             in.close();
             System.out.println(response.toString());
-            System.out.println("POST request not worked");
+            System.out.println(Methods.ANSI_YELLOW_BACKGROUND + Methods.ANSI_BLACK + "PUT request not worked"
+                    + Methods.ANSI_RESET);
             return 0;
         }
     }
@@ -276,7 +299,6 @@ public class Listing {
 
         int responseCode = con.getResponseCode();
         String outputCode = con.getResponseMessage();
-        System.out.println("POST Response Code :: " + responseCode + " " + outputCode);
 
         if (responseCode == HttpURLConnection.HTTP_OK) { // success
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -290,7 +312,6 @@ public class Listing {
             in.close();
 
             // print result
-            System.out.println(response.toString());
             return 1;
         } else {
             BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -303,7 +324,8 @@ public class Listing {
             }
             in.close();
             System.out.println(response.toString());
-            System.out.println("POST request not worked");
+            System.out.println(Methods.ANSI_YELLOW_BACKGROUND + Methods.ANSI_BLACK + "POST request not worked"
+                    + Methods.ANSI_RESET);
             return 0;
         }
     }

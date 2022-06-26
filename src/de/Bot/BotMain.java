@@ -69,7 +69,7 @@ public class BotMain {
 		articleFromSupplier = ds.getAlleArtikel();
 
 		while (true) {
-			timeGone = refreshTime * runCount;
+			timeGone = (1 / refreshTime) * runCount;
 
 			listings = Listing.getListings();
 			Article = getArticle();
@@ -91,6 +91,7 @@ public class BotMain {
 				Methods.chooseWhatToBuy();
 			} else {
 				logger.warning("Letzte halbe Stunde hat begonnen");
+				Listing.lowestPrice2 = 5.0;
 			}
 			SelfInfo = sendGETplayerSelf();
 			JsonReader jsonReader_cash = Json.createReader(new StringReader(SelfInfo));
@@ -118,18 +119,14 @@ public class BotMain {
 					}
 				}
 				// ? BestPrice ist auf min 12 festgelegt
-				if (Listing.best_prices.get(artid) == 1) {
-					Listing.offer(artid, quantity, Listing.best_prices.get((int) median));
+				if (Listing.getBestPrice(artid) == 1) {
+					Listing.offer(artid, quantity, Listing.getBestPrice((int) median));
 				} else {
-					Listing.offer(artid, quantity, Listing.best_prices.get(artid));
+					Listing.offer(artid, quantity, Listing.getBestPrice(artid));
 				}
 
-				// System.out.println(Listing.getBestPrice(artid) + " Werde ich hier auch
-				// arm?");
 			}
-
 			TimeUnit.SECONDS.sleep(refreshTime);
-
 		}
 	}
 
